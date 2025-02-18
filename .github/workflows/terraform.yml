@@ -1,42 +1,35 @@
-name: Terraform CI/CD Pipeline
+name: Terraform Plan and Apply
 
 on:
   push:
     branches:
-      - main # Trigger the workflow on push to the main branch
+      - main
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Set up Terraform
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: "latest"
+          terraform_version: latest # Terraform version
 
-      # Initialize Terraform
-      - name: Terraform Init
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Initialize Terraform
         run: terraform init
 
-      # Run Terraform Plan to check changes
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan
 
-      # Apply the changes with confirmation (optional, you can add manual approval)
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-
-      # Optional: Send a success notification (e.g., email, Slack) after successful apply
-      - name: Notify Success
-        run: echo "Terraform apply completed successfully."
+        run: terraform apply -auto-approve
