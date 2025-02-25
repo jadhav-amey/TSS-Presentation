@@ -28,11 +28,11 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
 
-      - name: Terraform Plan
-        run: terraform plan
-
       - name: Terraform Apply
         run: terraform apply -auto-approve
+
+      - name: Get EKS Cluster Name
+        run: echo "EKS_CLUSTER_NAME=$(terraform output -raw cluster_name)" >> $GITHUB_ENV
 
   kubernetes:
     runs-on: ubuntu-latest
@@ -55,7 +55,12 @@ jobs:
           version: latest # Kubernetes version
 
       - name: Update Kubeconfig
-        run: aws eks update-kubeconfig --name eks-cluster --region ${{ secrets.AWS_REGION }}
+        run: |
+          echo "Updating kubeconfig for cluster: $EKS_CLUSTER_NAME"
+          aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
+
+      - name: Verify Cluster Access
+        run: kubectl get nodes
 
       - name: Apply Kubernetes Manifests
         run: |
