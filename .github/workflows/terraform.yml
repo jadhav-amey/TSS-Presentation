@@ -11,15 +11,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: latest # Terraform version
+          terraform_version: latest
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -31,37 +31,29 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-      - name: Get EKS Cluster Name
-        run: |
-          CLUSTER_NAME=$(terraform output -raw cluster_name 2>/dev/null || echo "not_found")
-          echo "EKS_CLUSTER_NAME=$CLUSTER_NAME" >> $GITHUB_ENV
-          if [[ "$CLUSTER_NAME" == "not_found" ]]; then
-            echo "❌ EKS cluster name not found! Check Terraform state."
-            exit 1
-          fi
-
   kubernetes:
     runs-on: ubuntu-latest
     needs: terraform
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Set up Kubernetes
-        uses: azure/setup-kubectl@v1
+        uses: azure/setup-kubectl@v3
         with:
-          version: latest # Kubernetes version
+          version: latest
 
       - name: Update Kubeconfig
         run: |
+          echo "EKS_CLUSTER_NAME=${{ secrets.EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
           echo "Updating kubeconfig for cluster: $EKS_CLUSTER_NAME"
           aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
 
