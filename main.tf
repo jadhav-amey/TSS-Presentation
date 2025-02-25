@@ -34,4 +34,5 @@ module "ecr" {
 
   repository_name         = var.ecr_repository_name
   repository_force_delete = true
+  create_lifecycle_policy = false
 }
