@@ -1,3 +1,4 @@
+#VPC Variables
 variable "aws_region" {
   description = "AWS region"
   type        = string
@@ -8,6 +9,7 @@ variable "vpc_cidr" {
   type        = string
 }
 
+#EKS Variables
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
@@ -31,4 +33,10 @@ variable "max_capacity" {
 variable "min_capacity" {
   description = "Minimum number of worker nodes"
   type        = number
+}
+
+#ECR Variables
+variable "ecr_repository_name" {
+  description = "Name of the ECR repository"
+  type        = string
 }
