@@ -73,7 +73,7 @@ module "eks" {
 
 module "ecr" {
   source  = "terraform-aws-modules/ecr/aws"
-  version = "~> 3.0"
+  version = "~> 2.3"
 
   repository_name            = var.ecr_repository_name
   repository_force_delete    = true
