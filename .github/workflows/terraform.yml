@@ -32,7 +32,7 @@ jobs:
         run: terraform apply -auto-approve
 
       - name: Get EKS Cluster Name
-        run: echo "EKS_CLUSTER_NAME=$(terraform output -raw cluster_name)" >> $GITHUB_ENV
+        run: echo "EKS_CLUSTER_NAME=$(terraform output -raw cluster_name 2>/dev/null)" >> $GITHUB_ENV
 
   kubernetes:
     runs-on: ubuntu-latest
