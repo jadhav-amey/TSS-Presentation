@@ -32,7 +32,13 @@ jobs:
         run: terraform apply -auto-approve
 
       - name: Get EKS Cluster Name
-        run: echo "EKS_CLUSTER_NAME=$(terraform output -raw cluster_name 2>/dev/null)" >> $GITHUB_ENV
+        run: |
+          CLUSTER_NAME=$(terraform output -raw cluster_name 2>/dev/null || echo "not_found")
+          echo "EKS_CLUSTER_NAME=$CLUSTER_NAME" >> $GITHUB_ENV
+          if [[ "$CLUSTER_NAME" == "not_found" ]]; then
+            echo "❌ EKS cluster name not found! Check Terraform state."
+            exit 1
+          fi
 
   kubernetes:
     runs-on: ubuntu-latest
