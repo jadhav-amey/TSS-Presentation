@@ -53,9 +53,9 @@ jobs:
 
       - name: Update Kubeconfig
         run: |
-          echo "EKS_CLUSTER_NAME=${{ secrets.EKS_CLUSTER_NAME }}" >> $GITHUB_ENV
-          echo "Updating kubeconfig for cluster: $EKS_CLUSTER_NAME"
-          aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
+          echo "CLUSTER_NAME=${{ secrets.CLUSTER_NAME }}" >> $GITHUB_ENV
+          echo "Updating kubeconfig for cluster: $CLUSTER_NAME"
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
 
       - name: Verify Cluster Access
         run: kubectl get nodes

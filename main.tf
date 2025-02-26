@@ -1,25 +1,53 @@
-data "aws_availability_zones" "available" {}
-
-# Fetch latest supported EKS version dynamically
-data "aws_ssm_parameter" "eks_version" {
-  name = "/aws/service/eks/optimized-ami/latest/amazon-linux-2/recommended/version"
+# Create an S3 bucket for Terraform state storage
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "eks-tf-state-file-bucket"
 }
 
+# Enable versioning on the S3 bucket
+resource "aws_s3_bucket_versioning" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Block public access to the S3 bucket
+resource "aws_s3_bucket_public_access_block" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Create a DynamoDB table for Terraform state locking
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "terraform-state-lock"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+
+# VPC module
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
   name = "eks-vpc"
   cidr = var.vpc_cidr
 
-  azs             = slice(data.aws_availability_zones.available.names, 0, 2)
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24"]
+  azs            = ["${var.aws_region}a", "${var.aws_region}b"]
+  public_subnets = ["10.0.101.0/24", "10.0.102.0/24"]
 
-  enable_nat_gateway   = true
   enable_dns_hostnames = true
-  single_nat_gateway   = true
+  enable_dns_support   = true
 }
 
+# IAM Role for EKS Nodes
 resource "aws_iam_role" "eks_nodes" {
   name = "eks-nodes-role"
   assume_role_policy = jsonencode({
@@ -34,6 +62,7 @@ resource "aws_iam_role" "eks_nodes" {
   })
 }
 
+# IAM Role Attachments for EKS
 resource "aws_iam_role_policy_attachment" "eks_worker_node" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.eks_nodes.name
@@ -49,15 +78,15 @@ resource "aws_iam_role_policy_attachment" "eks_ec2_container_registry" {
   role       = aws_iam_role.eks_nodes.name
 }
 
+# EKS Cluster Module
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = var.cluster_name
-  cluster_version = data.aws_ssm_parameter.eks_version.value
-  subnet_ids      = module.vpc.private_subnets
+  cluster_version = "1.31"
+  subnet_ids      = module.vpc.public_subnets
   vpc_id          = module.vpc.vpc_id
 
-  cluster_endpoint_public_access  = true
-  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access = true
 
   eks_managed_node_groups = {
     default = {
@@ -71,9 +100,9 @@ module "eks" {
   }
 }
 
+# ECR Module
 module "ecr" {
-  source  = "terraform-aws-modules/ecr/aws"
-  version = "~> 2.3"
+  source = "terraform-aws-modules/ecr/aws"
 
   repository_name            = var.ecr_repository_name
   repository_force_delete    = true
