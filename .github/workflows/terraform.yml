@@ -60,7 +60,7 @@ jobs:
           set -e  # Exit on any error
           echo "CLUSTER_NAME=${{ secrets.CLUSTER_NAME }}" >> $GITHUB_ENV
           echo "Updating kubeconfig for cluster: $CLUSTER_NAME"
-          aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
+          aws eks update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
 
       - name: Verify Cluster Access
         run: |
