@@ -3,7 +3,7 @@ name: ECR & EKS Deployment -> Terraform
 on:
   push:
     branches:
-      - amey
+      - main
 
 jobs:
   terraform:
