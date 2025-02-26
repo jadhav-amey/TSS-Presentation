@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:latest
+          image: 941377156271.dkr.ecr.ap-south-1.amazonaws.com/ecr-repo:latest
           ports:
             - containerPort: 80
           volumeMounts:
