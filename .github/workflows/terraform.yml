@@ -21,9 +21,9 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{secrets.AWS_REGION }}
 
       - name: Initialize Terraform
         run: terraform init
@@ -42,9 +42,9 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{secrets.AWS_REGION }}
 
       - name: Set up Kubernetes
         uses: azure/setup-kubectl@v3
@@ -53,9 +53,9 @@ jobs:
 
       - name: Update Kubeconfig
         run: |
-          echo "CLUSTER_NAME=${{ secrets.CLUSTER_NAME }}" >> $GITHUB_ENV
+          echo "CLUSTER_NAME=${{secrets.CLUSTER_NAME }}" >> $GITHUB_ENV
           echo "Updating kubeconfig for cluster: $CLUSTER_NAME"
-          aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{ secrets.AWS_REGION }}
+          aws eks update-kubeconfig --name $CLUSTER_NAME --region ${{secrets.AWS_REGION }}
 
       - name: Verify Cluster Access
         run: kubectl get nodes
