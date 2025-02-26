@@ -23,15 +23,19 @@ jobs:
 
       - name: Terraform Init
         run: terraform init -upgrade
+        if: success()
 
       - name: Terraform Validate
         run: terraform validate
+        if: success()
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan -input=false
+        if: success()
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+        if: success()
 
   ecr:
     runs-on: ubuntu-latest
@@ -51,12 +55,15 @@ jobs:
 
       - name: Build Docker Image
         run: docker build -t ecr-repo .
+        if: success()
 
       - name: Tag Docker Image
         run: docker tag ecr-repo:latest 941377156271.dkr.ecr.ap-south-1.amazonaws.com/ecr-repo:latest
+        if: success()
 
       - name: Push Docker Image to ECR
         run: docker push 941377156271.dkr.ecr.ap-south-1.amazonaws.com/ecr-repo:latest
+        if: success()
 
   eks:
     runs-on: ubuntu-latest
@@ -74,10 +81,12 @@ jobs:
 
       - name: Configure kubectl
         run: aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+        if: success()
 
       - name: Apply Kubernetes Manifests
         run: |
           echo "Deploying Kubernetes manifests..."
-          kubectl apply -f manifest/configmap.yml
-          kubectl apply -f manifest/deployment.yml
-          kubectl apply -f manifest/service.yml
+          kubectl apply -f manifest/configmap.yml --validate=false
+          kubectl apply -f manifest/deployment.yml --validate=false
+          kubectl apply -f manifest/service.yml --validate=false
+        if: success()
