@@ -2,7 +2,7 @@
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "eks-vpc"
+  name = var.vpc_name
   cidr = var.vpc_cidr
 
   azs            = ["${var.aws_region}a", "${var.aws_region}b"]
@@ -25,7 +25,7 @@ module "eks" {
 
   eks_managed_node_groups = {
     default = {
-      node_group_name = "eks-nodes"
+      node_group_name = var.node_group_name
       instance_types  = [var.node_instance_type]
       min_size        = var.min_capacity
       max_size        = var.max_capacity

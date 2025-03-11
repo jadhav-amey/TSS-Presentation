@@ -3,6 +3,11 @@ variable "aws_region" {
   type        = string
 }
 
+variable "vpc_name" {
+  description = "VPC name"
+  type        = string
+}
+
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
   type        = string
@@ -10,6 +15,12 @@ variable "vpc_cidr" {
 
 variable "cluster_name" {
   description = "EKS cluster name"
+  type        = string
+
+}
+
+variable "node_group_name" {
+  description = "Name for the EKS node group"
   type        = string
 
 }
