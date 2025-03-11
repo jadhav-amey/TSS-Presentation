@@ -38,9 +38,21 @@ module "eks" {
 module "ecr" {
   source = "terraform-aws-modules/ecr/aws"
 
-  repository_name             = var.ecr_repository_name
-  repository_force_delete     = true
-  repository_encryption_type  = "AES256"
-  repository_lifecycle_policy = ""
+  repository_name            = var.ecr_repository_name
+  repository_force_delete    = true
+  repository_encryption_type = "AES256"
 
+  repository_lifecycle_policy = jsonencode({
+    rules = [{
+      rulePriority = 1
+      description  = "Expire images older than 30 days"
+      selection = {
+        tagStatus   = "untagged"
+        countType   = "sinceImagePushed"
+        countUnit   = "days"
+        countNumber = 30
+      }
+      action = { type = "expire" }
+    }]
+  })
 }
