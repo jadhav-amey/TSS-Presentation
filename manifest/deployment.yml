@@ -19,10 +19,3 @@ spec:
           image: 941377156271.dkr.ecr.ap-south-1.amazonaws.com/ecr-repo:latest
           ports:
             - containerPort: 80
-          volumeMounts:
-            - name: nginx-html-volume
-              mountPath: /usr/share/nginx/html
-      volumes:
-        - name: nginx-html-volume
-          configMap:
-            name: nginx-html
