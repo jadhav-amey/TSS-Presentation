@@ -58,7 +58,7 @@ jobs:
         run: docker build -t terraform-ecr-repo .
 
       - name: Tag Docker Image
-        run: docker tag ecr-repo:latest 941377156271.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:latest
+        run: docker tag terraform-ecr-repo:latest 941377156271.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:latest
 
       - name: Push Docker Image to ECR
         run: docker push 941377156271.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:latest
