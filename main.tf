@@ -21,8 +21,7 @@ module "eks" {
   subnet_ids      = module.vpc.public_subnets
   vpc_id          = module.vpc.vpc_id
 
-  cluster_endpoint_public_access  = true
-  kms_key_deletion_window_in_days = 0
+  cluster_endpoint_public_access = true
 
   eks_managed_node_groups = {
     default = {
