@@ -38,7 +38,9 @@ module "eks" {
 module "ecr" {
   source = "terraform-aws-modules/ecr/aws"
 
-  repository_name            = var.ecr_repository_name
-  repository_force_delete    = true
-  repository_encryption_type = "AES256"
+  repository_name             = var.ecr_repository_name
+  repository_force_delete     = true
+  repository_encryption_type  = "AES256"
+  repository_lifecycle_policy = ""
+
 }
