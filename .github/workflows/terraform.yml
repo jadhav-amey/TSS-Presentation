@@ -70,7 +70,8 @@ jobs:
     steps:
       - name: Configure kubectl
         run: aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-
+      - name: List Manifest Directory
+        run: ls -la manifest
       - name: Apply Kubernetes Manifests
         run: |
           echo "Deploying Kubernetes manifests..."
