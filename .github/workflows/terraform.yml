@@ -48,18 +48,20 @@ jobs:
     needs: terraform
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Authenticate to ECR
-        run: |
-          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+        run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 941377156271.dkr.ecr.ap-south-1.amazonaws.com
 
       - name: Build Docker Image
-        run: docker build -t terraform-ecr-repo -f Dockerfile .
+        run: docker build -t terraform-ecr-repo .
 
       - name: Tag Docker Image
-        run: docker tag terraform-ecr-repo:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_NAME }}:latest
+        run: docker tag ecr-repo:latest 941377156271.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:latest
 
       - name: Push Docker Image to ECR
-        run: docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_NAME }}:latest
+        run: docker push 941377156271.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:latest
 
   eks:
     runs-on: ubuntu-latest
