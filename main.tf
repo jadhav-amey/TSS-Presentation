@@ -27,12 +27,31 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   eks_managed_node_groups = {
-    default = {
+    terraform-eks-node-group = {
       node_group_name = var.node_group_name
       instance_types  = [var.node_instance_type]
       min_size        = var.min_capacity
       max_size        = var.max_capacity
       desired_size    = var.desired_capacity
+    }
+  }
+
+  # Add-ons for EKS
+  cluster_addons = {
+    coredns = {
+      addon_name               = "coredns"
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
+    }
+    vpc-cni = {
+      addon_name               = "vpc-cni"
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
+    }
+    kube-proxy = {
+      addon_name               = "kube-proxy"
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
     }
   }
 }
