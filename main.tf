@@ -28,11 +28,10 @@ module "eks" {
 
   eks_managed_node_groups = {
     terraform-eks-node-group = {
-      node_group_name = var.node_group_name
-      instance_types  = [var.node_instance_type]
-      min_size        = var.min_capacity
-      max_size        = var.max_capacity
-      desired_size    = var.desired_capacity
+      instance_types = [var.node_instance_type]
+      min_size       = var.min_capacity
+      max_size       = var.max_capacity
+      desired_size   = var.desired_capacity
     }
   }
 

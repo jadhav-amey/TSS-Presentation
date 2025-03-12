@@ -2,7 +2,6 @@ aws_region          = "ap-south-1"
 vpc_name            = "terraform-eks-vpc"
 vpc_cidr            = "10.0.0.0/16"
 cluster_name        = "terraform-eks-cluster"
-node_group_name     = "terraform-eks-node-group"
 node_instance_type  = "t3.medium"
 desired_capacity    = 1
 max_capacity        = 1

@@ -19,12 +19,6 @@ variable "cluster_name" {
 
 }
 
-variable "node_group_name" {
-  description = "Name for the EKS node group"
-  type        = string
-
-}
-
 variable "node_instance_type" {
   description = "Instance type for the EKS worker nodes"
   type        = string
