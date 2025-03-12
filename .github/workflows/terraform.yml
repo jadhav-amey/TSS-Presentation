@@ -76,13 +76,18 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Configure kubectl with AWS EKS
         run: |
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
           export KUBECONFIG=$HOME/.kube/config
           aws eks get-token --cluster-name ${{ env.CLUSTER_NAME }}
+
+      - name: Check Current Kubernetes Context
+        run: |
+          echo "Current Kubernetes Context:"
+          kubectl config current-context
 
       - name: Apply Kubernetes Manifests
         run: |
