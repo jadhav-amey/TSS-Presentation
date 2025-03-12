@@ -78,16 +78,27 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Debug AWS Identity & Cluster Info
+        run: |
+          echo "Checking AWS Identity..."
+          aws sts get-caller-identity
+
+          echo "Listing EKS Clusters..."
+          aws eks list-clusters --region ${{ env.AWS_REGION }}
+
       - name: Configure kubectl with AWS EKS
         run: |
+          echo "Updating Kubeconfig..."
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-          export KUBECONFIG=$HOME/.kube/config
-          aws eks get-token --cluster-name ${{ env.CLUSTER_NAME }}
 
-      - name: Check Current Kubernetes Context
-        run: |
-          echo "Current Kubernetes Context:"
+          echo "Verifying Kubeconfig Context..."
           kubectl config current-context
+
+          echo "Checking Cluster Info..."
+          kubectl cluster-info
+
+          echo "Checking Nodes..."
+          kubectl get nodes
 
       - name: Apply Kubernetes Manifests
         run: |
