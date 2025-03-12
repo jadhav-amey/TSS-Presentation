@@ -83,13 +83,15 @@ jobs:
           echo "Checking AWS Identity..."
           aws sts get-caller-identity
 
-          echo "Listing EKS Clusters..."
-          aws eks list-clusters --region ${{ env.AWS_REGION }}
-
       - name: Configure kubectl with AWS EKS
         run: |
           echo "Updating Kubeconfig..."
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: Check kubectl Version
+        run: |
+          echo "Checking kubectl version..."
+          kubectl version --client --output=yaml
 
       - name: Apply Kubernetes Manifests
         run: |
