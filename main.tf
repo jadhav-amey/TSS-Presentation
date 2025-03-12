@@ -18,12 +18,11 @@ module "vpc" {
 
 # EKS Cluster Module
 module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = var.cluster_name
-  cluster_version = "1.31"
-  subnet_ids      = module.vpc.public_subnets
-  vpc_id          = module.vpc.vpc_id
-
+  source                         = "terraform-aws-modules/eks/aws"
+  cluster_name                   = var.cluster_name
+  subnet_ids                     = module.vpc.public_subnets
+  vpc_id                         = module.vpc.vpc_id
+  enable_irsa                    = true # Enables IAM Roles for Service Accounts
   cluster_endpoint_public_access = true
 
   eks_managed_node_groups = {
@@ -32,25 +31,6 @@ module "eks" {
       min_size       = var.min_capacity
       max_size       = var.max_capacity
       desired_size   = var.desired_capacity
-    }
-  }
-
-  # Add-ons for EKS
-  cluster_addons = {
-    coredns = {
-      addon_name               = "coredns"
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = null
-    }
-    vpc-cni = {
-      addon_name               = "vpc-cni"
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = null
-    }
-    kube-proxy = {
-      addon_name               = "kube-proxy"
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = null
     }
   }
 }

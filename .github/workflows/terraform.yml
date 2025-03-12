@@ -21,13 +21,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
 
@@ -71,27 +64,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Debug AWS Identity & Cluster Info
-        run: |
-          echo "Checking AWS Identity..."
-          aws sts get-caller-identity
-
       - name: Configure kubectl with AWS EKS
         run: |
           echo "Updating Kubeconfig..."
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-
-      - name: Check kubectl Version
-        run: |
-          echo "Checking kubectl version..."
-          kubectl version --client --output=yaml
 
       - name: Apply Kubernetes Manifests
         run: |
