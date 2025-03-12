@@ -27,7 +27,7 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   eks_managed_node_groups = {
-    terraform-eks-node-group = {
+    default = {
       instance_types = [var.node_instance_type]
       min_size       = var.min_capacity
       max_size       = var.max_capacity
