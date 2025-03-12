@@ -91,15 +91,6 @@ jobs:
           echo "Updating Kubeconfig..."
           aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
-          echo "Verifying Kubeconfig Context..."
-          kubectl config current-context
-
-          echo "Checking Cluster Info..."
-          kubectl cluster-info
-
-          echo "Checking Nodes..."
-          kubectl get nodes
-
       - name: Apply Kubernetes Manifests
         run: |
           echo "Deploying Kubernetes manifests..."
