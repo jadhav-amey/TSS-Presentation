@@ -1,11 +1,14 @@
-# VPC module
+# Fetch AWS Availability Zones dynamically
+data "aws_availability_zones" "available" {}
+
+# VPC Module
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
   name = var.vpc_name
   cidr = var.vpc_cidr
 
-  azs            = ["${var.aws_region}a", "${var.aws_region}b"]
+  azs            = data.aws_availability_zones.available.names
   public_subnets = ["10.0.101.0/24", "10.0.102.0/24"]
 
   enable_dns_hostnames    = true
@@ -17,9 +20,10 @@ module "vpc" {
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = var.cluster_name
-  cluster_version = "1.31"
-  subnet_ids      = module.vpc.public_subnets
-  vpc_id          = module.vpc.vpc_id
+  cluster_version = "1.29"
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.public_subnets
 
   cluster_endpoint_public_access = true
 
@@ -30,8 +34,39 @@ module "eks" {
       min_size        = var.min_capacity
       max_size        = var.max_capacity
       desired_size    = var.desired_capacity
+
+      iam_role_arn = aws_iam_role.eks_nodes.arn # Adding IAM role for worker nodes
     }
   }
+}
+
+# IAM Role for EKS Node Group
+resource "aws_iam_role" "eks_nodes" {
+  name = "eks-node-group-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+# Attach Required Policies to worker nodes
+resource "aws_iam_role_policy_attachment" "eks_worker_node" {
+  role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cni" {
+  role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_container_registry" {
+  role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 # ECR Module
