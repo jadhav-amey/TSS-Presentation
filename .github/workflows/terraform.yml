@@ -65,8 +65,8 @@ jobs:
 
       - name: Apply Kubernetes Manifest
         run: |
-          kubectl apply -f mainfest/deployment.yml
-          kubectl apply -f mainfest/service.yml
+          kubectl apply -f manifest/deployment.yml
+          kubectl apply -f manifest/service.yml
 
       - name: Update Kubernetes Deployment Image
         run: |
