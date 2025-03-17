@@ -60,31 +60,3 @@ resource "aws_eks_node_group" "eks_nodes" {
 resource "aws_ecr_repository" "app_repo" {
   name = var.ecr_name
 }
-
-#S3 Module
-resource "aws_s3_bucket" "terraform_state" {
-  bucket = var.s3_bucket_name
-}
-
-resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
-  bucket = aws_s3_bucket.terraform_state.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-
-resource "aws_s3_bucket_ownership_controls" "state_bucket_ownership" {
-  bucket = aws_s3_bucket.terraform_state.id
-  rule {
-    object_ownership = "BucketOwnerEnforced"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "state_bucket_block" {
-  bucket                  = aws_s3_bucket.terraform_state.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
