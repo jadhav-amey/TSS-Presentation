@@ -6,4 +6,4 @@ instance_type    = "t3.medium"
 desired_size     = 1
 max_size         = 1
 min_size         = 1
-s3_bucket_name   = "terraform-tfstate-file-bucket"
+s3_bucket_name   = "eks-terraform-tfstate-file-bucket"
