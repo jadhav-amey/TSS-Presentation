@@ -1,12 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-service
-  labels:
-    app: nginx
+  name: simple-html-service
 spec:
   selector:
-    app: nginx
+    app: simple-html-app
   ports:
     - protocol: TCP
       port: 80

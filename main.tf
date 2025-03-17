@@ -1,59 +1,90 @@
-# Fetch AWS Availability Zones dynamically
-data "aws_availability_zones" "available" {}
-
 # VPC module
-module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+resource "aws_vpc" "eks_vpc" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags                 = { Name = "eks-vpc" }
+}
 
-  name = var.vpc_name
-  cidr = var.vpc_cidr
-
-  azs            = data.aws_availability_zones.available.names
-  public_subnets = ["10.0.101.0/24", "10.0.102.0/24"]
-
-  enable_dns_hostnames    = true
-  enable_dns_support      = true
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.eks_vpc.id
+  cidr_block              = var.subnet_cidr
   map_public_ip_on_launch = true
+  availability_zone       = var.availability_zone
+  tags                    = { Name = "eks-public-subnet" }
+}
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.eks_vpc.id
+  tags   = { Name = "eks-igw" }
+}
+
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.eks_vpc.id
+  tags   = { Name = "eks-public-rt" }
+}
+
+resource "aws_route" "default_route" {
+  route_table_id         = aws_route_table.public_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
+}
+
+resource "aws_route_table_association" "public_association" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.public_rt.id
 }
 
 # EKS Cluster Module
-module "eks" {
-  source                         = "terraform-aws-modules/eks/aws"
-  cluster_name                   = var.cluster_name
-  subnet_ids                     = module.vpc.public_subnets
-  vpc_id                         = module.vpc.vpc_id
-  enable_irsa                    = true # Enables IAM Roles for Service Accounts
-  cluster_endpoint_public_access = true
+resource "aws_eks_cluster" "eks" {
+  name     = var.eks_cluster_name
+  role_arn = aws_iam_role.eks_role.arn
+  vpc_config {
+    subnet_ids = [aws_subnet.public_subnet.id]
+  }
+}
 
-  eks_managed_node_groups = {
-    default = {
-      instance_types = [var.node_instance_type]
-      min_size       = var.min_capacity
-      max_size       = var.max_capacity
-      desired_size   = var.desired_capacity
-    }
+resource "aws_eks_node_group" "eks_nodes" {
+  cluster_name   = aws_eks_cluster.eks.name
+  node_role_arn  = aws_iam_role.eks_role.arn
+  subnet_ids     = [aws_subnet.public_subnet.id]
+  instance_types = [var.instance_type]
+  scaling_config {
+    desired_size = var.desired_size
+    max_size     = var.max_size
+    min_size     = var.min_size
   }
 }
 
 # ECR Module
-module "ecr" {
-  source = "terraform-aws-modules/ecr/aws"
+resource "aws_ecr_repository" "app_repo" {
+  name = var.ecr_name
+}
 
-  repository_name            = var.ecr_repository_name
-  repository_force_delete    = true
-  repository_encryption_type = "AES256"
+#S3 Module
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = var.s3_bucket_name
+}
 
-  repository_lifecycle_policy = jsonencode({
-    rules = [{
-      rulePriority = 1
-      description  = "Expire images older than 30 days"
-      selection = {
-        tagStatus   = "untagged"
-        countType   = "sinceImagePushed"
-        countUnit   = "days"
-        countNumber = 30
-      }
-      action = { type = "expire" }
-    }]
-  })
+resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
+  bucket = aws_s3_bucket.terraform_state.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_ownership_controls" "state_bucket_ownership" {
+  bucket = aws_s3_bucket.terraform_state.id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "state_bucket_block" {
+  bucket                  = aws_s3_bucket.terraform_state.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
