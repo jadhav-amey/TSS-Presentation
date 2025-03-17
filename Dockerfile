@@ -1,17 +1,10 @@
-# Use the official Nginx image as the base image
 FROM nginx:latest
 
-# Remove the default Nginx configuration file
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy the custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/
-
-# Copy the HTML file to the Nginx web directory
+# Copy index.html file from the local directory to the default NGINX directory
 COPY manifest/index.html /usr/share/nginx/html/index.html
 
-# Expose port 80 for the container
+# Expose port 80
 EXPOSE 80
 
-# Start Nginx when the container starts
+# Start NGINX
 CMD ["nginx", "-g", "daemon off;"]
