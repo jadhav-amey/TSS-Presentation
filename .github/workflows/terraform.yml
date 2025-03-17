@@ -63,7 +63,12 @@ jobs:
           echo "Updating Kubeconfig..."
           aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
-      - name: Deploy to Kubernetes
+      - name: Apply Kubernetes Manifest
+        run: |
+          kubectl apply -f mainfest/deployment.yml
+          kubectl apply -f mainfest/service.yml
+
+      - name: Update Kubernetes Deployment Image
         run: |
           kubectl set image deployment/demo-app demo-app=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_NAME }}:${{ github.sha }}
           kubectl rollout status deployment/demo-app
