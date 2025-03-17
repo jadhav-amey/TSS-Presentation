@@ -70,5 +70,5 @@ jobs:
 
       - name: Update Kubernetes Deployment Image
         run: |
-          kubectl set image deployment/demo-app demo-app=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_NAME }}:${{ github.sha }}
-          kubectl rollout status deployment/demo-app
+          kubectl set image deployment/demo-app-deployment demo-app=${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_NAME }}:${{ github.sha }}
+          kubectl rollout status deployment/demo-app-deployment
