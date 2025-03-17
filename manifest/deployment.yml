@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simple-html-app
+  name: demo-app-deployment
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: simple-html-app
+      app: demo-app
   template:
     metadata:
       labels:
-        app: simple-html-app
+        app: demo-app
     spec:
       containers:
-        - name: simple-html-app
-          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:latest
+        - name: demo-app
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:${GITHUB_SHA}
           imagePullPolicy: Always
           ports:
             - containerPort: 80
