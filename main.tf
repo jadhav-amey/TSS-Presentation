@@ -4,7 +4,7 @@ resource "aws_vpc" "eks_vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = { Name = "eks-vpc" }
+  tags = { Name = "terraform-eks-vpc" }
 }
 
 # Public Subnet 1
@@ -14,7 +14,7 @@ resource "aws_subnet" "public_subnet_1" {
   map_public_ip_on_launch = true
   availability_zone       = var.availability_zone_1
 
-  tags = { Name = "eks-public-subnet-1" }
+  tags = { Name = "terraform-eks-public-subnet-1" }
 }
 
 # Public Subnet 2
@@ -24,19 +24,19 @@ resource "aws_subnet" "public_subnet_2" {
   map_public_ip_on_launch = true
   availability_zone       = var.availability_zone_2
 
-  tags = { Name = "eks-public-subnet-2" }
+  tags = { Name = "terraform-eks-public-subnet-2" }
 }
 
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.eks_vpc.id
-  tags   = { Name = "eks-igw" }
+  tags   = { Name = "terraform-eks-igw" }
 }
 
 # Public Route Table
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.eks_vpc.id
-  tags   = { Name = "eks-public-rt" }
+  tags   = { Name = "terraform-eks-public-rt" }
 }
 
 resource "aws_route" "default_route" {
