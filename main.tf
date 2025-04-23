@@ -136,7 +136,7 @@ resource "aws_eks_node_group" "eks_nodes" {
 }
 
 # ECR Module
-resource "aws_ecr_repository" "app_repo" {
+resource "aws_ecr_repository" "ecr_repo" {
   name = var.ecr_name
 }
 
