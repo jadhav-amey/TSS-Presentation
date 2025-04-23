@@ -142,7 +142,7 @@ resource "aws_ecr_repository" "ecr_repo" {
 
 # ECR Lifecycle Policy
 resource "aws_ecr_lifecycle_policy" "ecr_policy" {
-  repository = aws_ecr_repository.app_repo.name
+  repository = aws_ecr_repository.ecr_repo.name
 
   policy = jsonencode({
     rules = [
