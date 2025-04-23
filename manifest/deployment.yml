@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: demo-app
-          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-south-1.amazonaws.com/terraform-ecr-repo:${GITHUB_SHA}
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/terraform-ecr-repo:${GITHUB_SHA}
           imagePullPolicy: Always
           ports:
             - containerPort: 80

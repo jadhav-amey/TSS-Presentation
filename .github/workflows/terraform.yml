@@ -1,4 +1,4 @@
-name: ECR & EKS Deployment → Terraform
+name: Terraform → ECR & EKS Deployment
 
 on:
   push:
